@@ -5,12 +5,11 @@ import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
+import android.view.KeyEvent
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,7 +17,6 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.shenawynkov.weatherApp.R
 import com.shenawynkov.weatherApp.databinding.ActivityMainBinding
-import com.shenawynkov.weatherApp.utils.MyTextWatcher
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -43,12 +41,24 @@ class HomeActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         initSearch()
-        checkPermissions()
+        getWeatherByLocation()
         observe()
     }
 
     private fun initSearch() {
-        binding.editText.addTextChangedListener(MyTextWatcher(viewModel::getWeatherByCity))
+       binding.edSearch. setOnKeyListener(object : View.OnKeyListener {
+            override fun onKey(v: View?, keyCode: Int, event: KeyEvent): Boolean {
+                // If the event is a key-down event on the "enter" button
+                if (event.action == KeyEvent.ACTION_DOWN &&
+                    keyCode == KeyEvent.KEYCODE_ENTER
+                ) {
+                    viewModel.getWeatherByCity(binding.edSearch.text.toString())
+
+                    return true
+                }
+                return false
+            }
+        })
     }
 
     private fun observe() {
@@ -57,10 +67,16 @@ class HomeActivity : AppCompatActivity() {
                 Toast.makeText(this, it, Toast.LENGTH_LONG).show()
             }
         })
+        viewModel.weather.observe(this, Observer {
+            it?.let {
+                weatherResponse ->
+                binding.edSearch.setText(weatherResponse.name)
+            }
+        })
     }
 
 
-    private fun checkPermissions() {
+    private fun getWeatherByLocation() {
 
 
         val locationPermissionRequest = registerForActivityResult(
@@ -97,14 +113,15 @@ class HomeActivity : AppCompatActivity() {
             )
 
             return
-        } else {
+        }
+        else {
             updateLocation()
 
         }
 
     }
 
-    fun updateLocation() {
+    private fun updateLocation() {
 
 
         if (ActivityCompat.checkSelfPermission(

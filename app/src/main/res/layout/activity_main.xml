@@ -16,7 +16,7 @@
         tools:context=".ui.HomeActivity">
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/ed_search"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginStart="16dp"
@@ -28,9 +28,11 @@
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:hint="@string/search_text"
+            android:maxLines="1"
+            android:nestedScrollingEnabled="false"
             android:paddingStart="8dp"
-            android:paddingTop="8dp"
             android:paddingEnd="16dp"
+            android:singleLine="true"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +46,7 @@
             android:layout_marginTop="16dp"
             android:text="@{viewmodel.weather.name}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editText" />
+            app:layout_constraintTop_toBottomOf="@+id/ed_search" />
 
         <TextView
             android:id="@+id/tv_degree"
